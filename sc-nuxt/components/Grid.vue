@@ -17,7 +17,7 @@ const searchQuery = ref("");
 const perPage = ref(10);
 const totalPages = ref(0);
 const { currentPage } = usePagination();
-let apiUrl = ref("https://api.starcitizen-api.com/e4f804684b9310443ad1ccc42fdafa95/v1/cache/ships");
+let apiUrl = ref(`https://api.starcitizen-api.com/${import.meta.env.VITE_API_KEY}/v1/cache/ships`);
 
 const {
   data: responseData,
@@ -48,7 +48,7 @@ watch(
 watch(
   searchQuery,
   (newValue) => {
-    apiUrl.value = `https://api.starcitizen-api.com/e4f804684b9310443ad1ccc42fdafa95/v1/cache/ships${
+    apiUrl.value = `https://api.starcitizen-api.com/${import.meta.env.VITE_API_KEY}/v1/cache/ships${
       newValue ? `?name=${encodeURIComponent(newValue)}` : ""
     }`;
     currentPage.value = 1;

@@ -3,6 +3,7 @@ export default defineNuxtConfig({
   devtools: { enabled: false },
   modules: ['@nuxtjs/tailwindcss', '@nuxt/image'],
   app: {
+    // baseURL: '/star-citizen-tool/',
     head: {
       title: 'Star Citizen Tool',
       meta: [
