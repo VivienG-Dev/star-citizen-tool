@@ -16,7 +16,7 @@ const {
   pending,
   error,
   refresh,
-} = useFetch<ApiResponse>(`https://api.starcitizen-api.com/e4f804684b9310443ad1ccc42fdafa95/v1/cache/ships?id=${id}`);
+} = useFetch<ApiResponse>(`https://api.starcitizen-api.com/${import.meta.env.VITE_API_KEY}/v1/cache/ships?id=${id}`);
 
 const ship = ref<Ship | null>(null);
 let componentTypes: { title: string; components: Component[] }[] = [];
