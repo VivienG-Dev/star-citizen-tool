@@ -100,6 +100,10 @@ const displayedPages = computed(() => {
     pages = [...pages, totalPages.value];
   }
 
+  if (minPage > 1) {
+    pages = [1, ...pages];
+  }
+
   return pages;
 });
 
