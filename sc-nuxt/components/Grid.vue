@@ -84,11 +84,23 @@ const goToPage = (page: number) => {
   currentPage.value = page;
 };
 
+const isSreenSizeMobile = () => {
+  return window.innerWidth < 768;
+};
+
 const displayedPages = computed(() => {
-  const range = 2;
+  let range = 0;
+  isSreenSizeMobile() ? (range = 1) : (range = 2);
   const minPage = Math.max(1, currentPage.value - range);
-  const maxPage = Math.min(totalPages.value, currentPage.value + range);
-  return Array.from({ length: maxPage - minPage + 1 }, (_, i) => minPage + i);
+  let maxPage = Math.min(totalPages.value, currentPage.value + range);
+
+  let pages = Array.from({ length: maxPage - minPage + 1 }, (_, i) => minPage + i);
+
+  if (totalPages.value > maxPage) {
+    pages = [...pages, totalPages.value];
+  }
+
+  return pages;
 });
 
 const truncateDescription = (text: string, maxLength: number = 100) => {
@@ -179,8 +191,8 @@ const onImageError = (event: Event) => {
       An error occurred: {{ error.message }}
     </div>
     <div v-else>
-      <div class="flex justify-center items-center space-x-4 my-10">
-        <Button :next="true" text="Prev" @click="prevPage" :disabled="currentPage === 1" />
+      <div class="flex justify-center items-center space-x-3 my-10">
+        <Button v-if="currentPage !== 1" :next="true" text="Prev" @click="prevPage" :disabled="currentPage === 1" />
 
         <div class="flex space-x-2">
           <button
@@ -194,7 +206,13 @@ const onImageError = (event: Event) => {
           </button>
         </div>
 
-        <Button :next="true" text="Next" @click="nextPage" :disabled="currentPage === totalPages" />
+        <Button
+          v-if="currentPage !== totalPages"
+          :next="true"
+          text="Next"
+          @click="nextPage"
+          :disabled="currentPage === totalPages"
+        />
       </div>
 
       <div class="my-10 gap-8 columns-1" v-for="ship in paginatedData" :key="ship?.id">
