@@ -14,6 +14,7 @@ interface ApiError {
 }
 
 let timeoutId: number | null = null;
+let cachedData = localStorage.getItem("shipsData");
 
 const searchQuery = ref("");
 const perPage = ref(10);
@@ -36,13 +37,6 @@ const {
 
 const data = ref<ApiResponse | null>(null);
 
-const debounce = (func: () => void, delay: number) => {
-  if (timeoutId) {
-    clearTimeout(timeoutId);
-  }
-  timeoutId = window.setTimeout(func, delay);
-};
-
 watch(
   responseData,
   (newData) => {
@@ -57,27 +51,16 @@ watch(
 watch(
   searchQuery,
   () => {
-    debounce(() => {
-      apiUrl.value = `https://api.starcitizen-api.com/${import.meta.env.VITE_API_KEY}/v1/cache/ships${
-        searchQuery.value ? `?name=${encodeURIComponent(searchQuery.value)}` : ""
-      }`;
+    apiUrl.value = `https://api.starcitizen-api.com/${import.meta.env.VITE_API_KEY}/v1/cache/ships${
+      searchQuery.value ? `?name=${encodeURIComponent(searchQuery.value)}` : ""
+    }`;
+    currentPage.value = 1;
+    refresh();
 
-      let newQuery = {};
-      if (searchQuery.value) {
-        currentPage.value = 1;
-        newQuery = { name: searchQuery.value };
-      } else {
-        // Include the current page in the query if searchQuery is empty
-        newQuery = currentPage.value > 1 ? { page: currentPage.value } : {};
-      }
-
-      refresh();
-
-      // Update the URL without reloading the page
-      router.replace({ query: newQuery }).catch((err) => {
-        console.log(err);
-      });
-    }, 500);
+    // Update the URL without reloading the page
+    router.replace({ query: searchQuery.value ? { name: searchQuery.value } : {} }).catch((err) => {
+      console.log(err);
+    });
   },
   { immediate: true }
 );
