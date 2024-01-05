@@ -61,11 +61,20 @@ watch(
       apiUrl.value = `https://api.starcitizen-api.com/${import.meta.env.VITE_API_KEY}/v1/cache/ships${
         searchQuery.value ? `?name=${encodeURIComponent(searchQuery.value)}` : ""
       }`;
-      currentPage.value = 1;
+
+      let newQuery = {};
+      if (searchQuery.value) {
+        currentPage.value = 1;
+        newQuery = { name: searchQuery.value };
+      } else {
+        // Include the current page in the query if searchQuery is empty
+        newQuery = currentPage.value > 1 ? { page: currentPage.value } : {};
+      }
+
       refresh();
 
       // Update the URL without reloading the page
-      router.replace({ query: searchQuery.value ? { name: searchQuery.value } : {} }).catch((err) => {
+      router.replace({ query: newQuery }).catch((err) => {
         console.log(err);
       });
     }, 500);
