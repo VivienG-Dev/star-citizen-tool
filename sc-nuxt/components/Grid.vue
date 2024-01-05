@@ -82,17 +82,20 @@ const paginatedData = computed(() => {
 const nextPage = () => {
   if (currentPage.value < totalPages.value) {
     currentPage.value++;
+    window.scrollTo(0, 0);
   }
 };
 
 const prevPage = () => {
   if (currentPage.value > 1) {
     currentPage.value--;
+    window.scrollTo(0, 0);
   }
 };
 
 const goToPage = (page: number) => {
   currentPage.value = page;
+  window.scrollTo(0, 0);
 };
 
 const isSreenSizeMobile = () => {
