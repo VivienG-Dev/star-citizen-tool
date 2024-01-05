@@ -13,6 +13,8 @@ interface ApiError {
   message: string;
 }
 
+let timeoutId: number | null = null;
+
 const searchQuery = ref("");
 const perPage = ref(10);
 const totalPages = ref(0);
@@ -34,6 +36,13 @@ const {
 
 const data = ref<ApiResponse | null>(null);
 
+const debounce = (func: () => void, delay: number) => {
+  if (timeoutId) {
+    clearTimeout(timeoutId);
+  }
+  timeoutId = window.setTimeout(func, delay);
+};
+
 watch(
   responseData,
   (newData) => {
@@ -47,17 +56,19 @@ watch(
 
 watch(
   searchQuery,
-  (newValue) => {
-    apiUrl.value = `https://api.starcitizen-api.com/${import.meta.env.VITE_API_KEY}/v1/cache/ships${
-      newValue ? `?name=${encodeURIComponent(newValue)}` : ""
-    }`;
-    currentPage.value = 1;
-    refresh();
+  () => {
+    debounce(() => {
+      apiUrl.value = `https://api.starcitizen-api.com/${import.meta.env.VITE_API_KEY}/v1/cache/ships${
+        searchQuery.value ? `?name=${encodeURIComponent(searchQuery.value)}` : ""
+      }`;
+      currentPage.value = 1;
+      refresh();
 
-    // Update the URL without reloading the page
-    router.replace({ query: newValue ? { name: newValue } : {} }).catch((err) => {
-      console.log(err);
-    });
+      // Update the URL without reloading the page
+      router.replace({ query: searchQuery.value ? { name: searchQuery.value } : {} }).catch((err) => {
+        console.log(err);
+      });
+    }, 500);
   },
   { immediate: true }
 );
