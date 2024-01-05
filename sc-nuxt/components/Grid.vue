@@ -13,9 +13,6 @@ interface ApiError {
   message: string;
 }
 
-let timeoutId: number | null = null;
-let cachedData = localStorage.getItem("shipsData");
-
 const searchQuery = ref("");
 const perPage = ref(10);
 const totalPages = ref(0);
