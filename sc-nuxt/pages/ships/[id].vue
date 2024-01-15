@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useRoute } from "vue-router";
 import { ref } from "vue";
-import { Ship, Component } from "@/types/ship";
+import { type Ship, type Component } from "@/types/ship";
 
 interface ApiResponse {
   data: Ship[];
@@ -10,13 +10,18 @@ interface ApiResponse {
 const route = useRoute();
 const router = useRouter();
 const id = route.params.id;
+const nuxtApp = useNuxtApp();
 
 const {
   data: apiResponse,
   pending,
   error,
   refresh,
-} = useFetch<ApiResponse>(`https://api.starcitizen-api.com/${import.meta.env.VITE_API_KEY}/v1/cache/ships?id=${id}`);
+} = useFetch<ApiResponse>(() => `https://api.starcitizen-api.com/${import.meta.env.VITE_API_KEY}/v1/cache/ships?id=${id}`, {
+  getCachedData(key) {
+    return nuxtApp.payload.data[key] || nuxtApp.static.data[key];
+  },
+});
 
 const ship = ref<Ship | null>(null);
 let componentTypes: { title: string; components: Component[] }[] = [];

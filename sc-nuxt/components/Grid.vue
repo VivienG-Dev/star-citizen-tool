@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { Ship } from "@/types/ship";
+import { type Ship } from "@/types/ship";
 
 const router = useRouter();
 
@@ -13,11 +13,16 @@ interface ApiError {
   message: string;
 }
 
-const searchQuery = ref("");
+const searchQuery = ref(
+  Array.isArray(router.currentRoute.value.query.name)
+    ? router.currentRoute.value.query.name[0]
+    : router.currentRoute.value.query.name || ""
+);
 const perPage = ref(10);
 const totalPages = ref(0);
 const { currentPage } = usePagination();
 let apiUrl = ref(`https://api.starcitizen-api.com/${import.meta.env.VITE_API_KEY}/v1/cache/ships`);
+const nuxtApp = useNuxtApp();
 
 const {
   data: responseData,
@@ -28,6 +33,9 @@ const {
   method: "GET",
   headers: {
     "Content-Type": "application/json",
+  },
+  getCachedData(key) {
+    return nuxtApp.payload.data[key] || nuxtApp.static.data[key];
   },
   immediate: true,
 });
@@ -52,7 +60,6 @@ watch(
       searchQuery.value ? `?name=${encodeURIComponent(searchQuery.value)}` : ""
     }`;
     currentPage.value = 1;
-    refresh();
 
     // Update the URL without reloading the page
     router.replace({ query: searchQuery.value ? { name: searchQuery.value } : {} }).catch((err) => {
